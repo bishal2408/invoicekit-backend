@@ -19,8 +19,8 @@
     },
     "lint-staged": {
         "**/*.php*": [
-            "vendor/bin/duster lint",
-            "vendor/bin/phpstan analyse --memory-limit=2G"
+            "php vendor/bin/duster lint",
+            "php vendor/bin/phpstan analyse --memory-limit=2G"
         ]
     }
 }
