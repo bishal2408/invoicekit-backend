@@ -4,7 +4,7 @@ namespace App\Services\ApiKey;
 
 use Illuminate\Support\Str;
 
-abstract class GeneratorService
+class GeneratorService
 {
     /**
      * generate

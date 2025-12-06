@@ -15,7 +15,7 @@ class ApiKeyEnvironmentSeeder extends Seeder
         // data to be seeeded
         $data = [
             ['name' => 'live', 'description' => 'Production environment'],
-            ['name' => 'development', 'description' => 'Development environment'],
+            ['name' => 'test', 'description' => 'Development environment'],
         ];
 
         // create or update records

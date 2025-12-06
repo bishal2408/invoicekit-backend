@@ -2,7 +2,8 @@
 
 namespace App\Services\ApiKey;
 
-use App\Http\Repositories\ApiKey\ApiKeyRepository;
+use App\Repositories\ApiKey\ApiKeyRepository;
+use App\Repositories\ApiKey\EnvironmentRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

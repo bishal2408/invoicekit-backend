@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Repositories\ApiKey;
+namespace App\Repositories\ApiKey;
 
 use App\Models\ApiKey\ApiKey;
 use App\Repositories\Repository;
