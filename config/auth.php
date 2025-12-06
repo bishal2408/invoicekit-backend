@@ -62,7 +62,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', App\Models\User\User::class),
         ],
 
         // 'users' => [
@@ -97,6 +97,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        'algorithm' => 'sha256',
     ],
 
     /*
@@ -112,4 +113,11 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Persoal Access Token Name
+    |--------------------------------------------------------------------------
+    |
+    */
+    'access_token_name' => 'LoginToken',
 ];
