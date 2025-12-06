@@ -5,9 +5,12 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\Auth\LoginRequest;
 use App\Services\User\AuthService;
+use App\Traits\Response;
 
 class AuthController extends Controller
 {
+    use Response;
+
     /**
      * authService
      *
@@ -35,9 +38,13 @@ class AuthController extends Controller
 
         $token = $this->authService->login($email, $password);
 
-        return response()->json([
-            'access_token' => $token,
-        ]);
+        if ($token) {
+            return $this->sendResponseWithData([
+                'access_token' => $token,
+            ], 'LOGIN_SUCCESS');
+        }
+
+        return $this->errorResponse('LOGIN_FAILED');
     }
 
     /**
@@ -49,10 +56,12 @@ class AuthController extends Controller
     {
         $user = auth('sanctum')->user();
 
-        $this->authService->logout($user);
+        $response = $this->authService->logout($user);
 
-        return response()->json([
-            'message' => 'Logout Successful',
-        ], 200);
+        if ($response) {
+            return $this->sendResponse('LOGOUT_SUCCESS');
+        }
+
+        return $this->errorResponse('LOGOUT_FAILED');
     }
 }
