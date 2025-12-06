@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiKey\ApiKeyController;
 use App\Http\Controllers\User\AuthController;
 use Illuminate\Support\Facades\Route;
 
