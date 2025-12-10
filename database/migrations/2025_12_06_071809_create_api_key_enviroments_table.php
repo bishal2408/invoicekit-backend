@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('api_key_enviroments', function (Blueprint $table) {
+        Schema::create('api_key_environments', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->string('description')->nullable();
@@ -18,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('api_key_enviroments');
+        Schema::dropIfExists('api_key_environments');
     }
 };

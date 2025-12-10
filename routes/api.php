@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiKey\ApiKeyController;
 use App\Http\Controllers\User\AuthController;
+use App\Http\Middleware\SanitizeParams;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,5 +36,8 @@ Route::prefix('v1')
 
             // revoke
             Route::put('key/{api_key}/revoke', 'revoke')->name('key.revoke');
+
+            // list api keys
+            Route::get('key', 'index')->middleware(SanitizeParams::class)->name('key.index');
         });
     });

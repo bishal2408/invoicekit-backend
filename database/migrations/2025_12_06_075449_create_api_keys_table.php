@@ -23,7 +23,7 @@ return new class extends Migration
 
             // define foreign keys
             $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('environment_id')->references('id')->on('api_key_enviroments')->onDelete('restrict');
+            $table->foreign('environment_id')->references('id')->on('api_key_environments')->onDelete('restrict');
         });
     }
 

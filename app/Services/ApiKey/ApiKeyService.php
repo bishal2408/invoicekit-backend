@@ -4,6 +4,7 @@ namespace App\Services\ApiKey;
 
 use App\Repositories\ApiKey\ApiKeyRepository;
 use App\Repositories\ApiKey\EnvironmentRepository;
+use App\Repositories\ApiKey\ListRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -31,16 +32,46 @@ class ApiKeyService
     private $generatorService;
 
     /**
+     * $listRepository
+     *
+     * @var ListRepository
+     */
+    private $listRepository;
+
+    /**
      * __construct
      */
     public function __construct(
         ApiKeyRepository $apiKeyRepository,
         EnvironmentRepository $environmentRepository,
-        GeneratorService $generatorService
+        GeneratorService $generatorService,
+        ListRepository $listRepository
     ) {
         $this->apiKeyRepository = $apiKeyRepository;
         $this->environmentRepository = $environmentRepository;
         $this->generatorService = $generatorService;
+        $this->listRepository = $listRepository;
+    }
+
+    /**
+     * list
+     *
+     * @param  mixed  $perPage
+     * @param  mixed  $orderBy
+     * @param  mixed  $orderByDir
+     * @param  mixed  $filters
+     * @param  mixed  $search
+     * @return mixed
+     */
+    public function list($perPage, $orderBy, $orderByDir, $filters, $search)
+    {
+        return $this->listRepository->list(
+            $perPage,
+            $orderBy,
+            $orderByDir,
+            $filters,
+            $search
+        );
     }
 
     /**

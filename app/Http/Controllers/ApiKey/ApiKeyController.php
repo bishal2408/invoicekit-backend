@@ -4,8 +4,10 @@ namespace App\Http\Controllers\ApiKey;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ApiKey\CreateRequest;
+use App\Http\Requests\ApiKey\ListRequest;
 use App\Http\Requests\ApiKey\RegenerateRequest;
 use App\Http\Requests\ApiKey\RevokeRequest;
+use App\Http\Resources\ApiKey\ListResource;
 use App\Services\ApiKey\ApiKeyService;
 use App\Traits\Response;
 
@@ -26,6 +28,31 @@ class ApiKeyController extends Controller
     public function __construct(ApiKeyService $apiKeyService)
     {
         $this->apiKeyService = $apiKeyService;
+    }
+
+    /**
+     * index
+     *
+     * @return \Illuminate\Http\Resources\Json\JsonResource
+     */
+    public function index(ListRequest $request)
+    {
+        $search = $request->get('search');
+        $perPage = $request->validated('per_page');
+        $orderBy = $request->validated('order_by');
+        $orderByDir = $request->validated('order_by_dir');
+        $filters = $request->validated('filters');
+
+        // data
+        $data = $this->apiKeyService->list(
+            $perPage,
+            $orderBy,
+            $orderByDir,
+            $filters,
+            $search
+        );
+
+        return ListResource::collection($data);
     }
 
     /**
