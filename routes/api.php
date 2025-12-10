@@ -27,6 +27,10 @@ Route::prefix('v1')
     ->group(function () {
         // api key routes
         Route::controller(ApiKeyController::class)->group(function () {
+            // store key
             Route::post('key', 'store')->name('key.store');
+
+            // regenerated key
+            Route::post('key/{api_key}/regenerate', 'regenerate')->name('key.regenerate');
         });
     });

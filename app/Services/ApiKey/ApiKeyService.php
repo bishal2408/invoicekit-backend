@@ -82,4 +82,50 @@ class ApiKeyService
 
         return false;
     }
+
+    /**
+     * renegerate
+     *
+     * @param  mixed  $id
+     * @return mixed
+     */
+    public function regenerate($id)
+    {
+        /** @var \App\Models\ApiKey\ApiKey $apiKey */
+        $apiKey = $this->apiKeyRepository->find($id);
+
+        try {
+            DB::beginTransaction();
+
+            // make current key inactive
+            $this->apiKeyRepository->update($id, [
+                'is_active' => null,
+                'deleted_at' => now(),
+            ]);
+
+            // generate new key
+            $keyData = $this->generatorService->generate($apiKey->environment->name);
+
+            // make new api key record
+            $this->apiKeyRepository->store([
+                'user_id' => $apiKey->user_id,
+                'environment_id' => $apiKey->environment_id,
+                'name' => $apiKey->name,
+                'key_prefix' => $keyData['key_prefix'],
+                'key_hash' => $keyData['key_hash'],
+            ]);
+
+            // commit transaction
+            DB::commit();
+
+            return [
+                'plain_key' => $keyData['plain'],
+            ];
+        } catch (\Exception $e) {
+            Log::info('API Key Regeneration Error: ', [$e->getMessage()]);
+            DB::rollBack();
+        }
+
+        return false;
+    }
 }
