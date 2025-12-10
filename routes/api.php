@@ -32,5 +32,8 @@ Route::prefix('v1')
 
             // regenerated key
             Route::post('key/{api_key}/regenerate', 'regenerate')->name('key.regenerate');
+
+            // revoke
+            Route::put('key/{api_key}/revoke', 'revoke')->name('key.revoke');
         });
     });

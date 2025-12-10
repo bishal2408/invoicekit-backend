@@ -100,7 +100,6 @@ class ApiKeyService
             // make current key inactive
             $this->apiKeyRepository->update($id, [
                 'is_active' => null,
-                'deleted_at' => now(),
             ]);
 
             // generate new key
@@ -113,6 +112,7 @@ class ApiKeyService
                 'name' => $apiKey->name,
                 'key_prefix' => $keyData['key_prefix'],
                 'key_hash' => $keyData['key_hash'],
+                'is_active' => true,
             ]);
 
             // commit transaction
@@ -127,5 +127,18 @@ class ApiKeyService
         }
 
         return false;
+    }
+
+    /**
+     * revoke
+     *
+     * @param  mixed  $id
+     * @return mixed
+     */
+    public function revoke($id)
+    {
+        return $this->apiKeyRepository->update($id, [
+            'is_active' => null,
+        ]);
     }
 }
