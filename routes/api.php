@@ -1,7 +1,15 @@
 <?php
 
+use App\Http\Controllers\ApiKey\ApiKeyController;
 use App\Http\Controllers\User\AuthController;
+use App\Http\Middleware\SanitizeParams;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
 
 // login routes
 Route::group([], function () {
@@ -14,3 +22,22 @@ Route::group([], function () {
             ->name('user.logout');
     });
 });
+
+Route::prefix('v1')
+    ->middleware('auth:sanctum')
+    ->group(function () {
+        // api key routes
+        Route::controller(ApiKeyController::class)->group(function () {
+            // store key
+            Route::post('key', 'store')->name('key.store');
+
+            // regenerated key
+            Route::post('key/{api_key}/regenerate', 'regenerate')->name('key.regenerate');
+
+            // revoke
+            Route::put('key/{api_key}/revoke', 'revoke')->name('key.revoke');
+
+            // list api keys
+            Route::get('key', 'index')->middleware(SanitizeParams::class)->name('key.index');
+        });
+    });

@@ -56,7 +56,7 @@ abstract class Repository implements RepositoryInterface
      */
     public function update($id, array $data)
     {
-        return $this->model->update($id, $data);
+        return $this->model->find($id)->update($data);
     }
 
     /**
