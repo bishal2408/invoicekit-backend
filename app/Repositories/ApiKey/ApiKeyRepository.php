@@ -16,4 +16,18 @@ class ApiKeyRepository extends Repository
     {
         return ApiKey::class;
     }
+
+    /**
+     * findActiveKeyByPrefix
+     *
+     * @param  string  $prefix
+     * @return mixed
+     */
+    public function findActiveKeyByPrefix($prefix)
+    {
+        return $this->model
+            ->where('key_prefix', $prefix)
+            ->where('is_active', true)
+            ->first();
+    }
 }
