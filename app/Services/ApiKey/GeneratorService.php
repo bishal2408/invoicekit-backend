@@ -29,7 +29,7 @@ class GeneratorService
         $plain = "{$env}_{$prefix}_{$random}";
 
         // hash key
-        $hash = hash('sha256', $plain);
+        $hash = hash(config('auth.passwords.algorithm'), $plain);
 
         // return plain and hash values
         return [
