@@ -33,24 +33,29 @@ class UsageLoggerService
      */
     public function log($request, $response, $apiKey, $startTime)
     {
-        // current unix timestamp with millisecond
-        $endTime = microtime(true);
+        try {
+            // current unix timestamp with millisecond
+            $endTime = microtime(true);
 
-        // calculate response time
-        $responseTimeMs = (int) (($endTime - $startTime) * 1000);
+            // calculate response time
+            $responseTimeMs = (int) (($endTime - $startTime) * 1000);
 
-        // log api key usage
-        $this->usageLoggerRepository->store([
-            'api_key_id' => $apiKey->id,
-            'endpoint' => $request->path(),
-            'method' => $request->method(),
-            'status_code' => $response->getStatusCode(),
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'response_time_ms' => $responseTimeMs,
-        ]);
+            // log api key usage
+            $this->usageLoggerRepository->store([
+                'api_key_id' => $apiKey->id,
+                'endpoint' => $request->path(),
+                'method' => $request->method(),
+                'status_code' => $response->getStatusCode(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'response_time_ms' => $responseTimeMs,
+            ]);
 
-        // update last used date for api key
-        $apiKey->touchLastUsed();
+            // update last used date for api key
+            $apiKey->touchLastUsed();
+        } catch (\Throwable $e) {
+            // never break API because of logging
+            report($e);
+        }
     }
 }
