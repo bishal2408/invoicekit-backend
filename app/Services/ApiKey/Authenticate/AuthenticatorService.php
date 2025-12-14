@@ -3,6 +3,7 @@
 namespace App\Services\ApiKey\Authenticate;
 
 use App\Repositories\ApiKey\ApiKeyRepository;
+use App\Repositories\ApiKey\UsageLoggerRepository;
 use Illuminate\Http\Request;
 
 class AuthenticatorService
@@ -15,11 +16,21 @@ class AuthenticatorService
     private $apiKeyRepository;
 
     /**
+     * usageLoggerRepository
+     *
+     * @var UsageLoggerRepository
+     */
+    private $usageLoggerRepository;
+
+    /**
      * __construct
      */
-    public function __construct(ApiKeyRepository $apiKeyRepository)
-    {
+    public function __construct(
+        ApiKeyRepository $apiKeyRepository,
+        UsageLoggerRepository $usageLoggerRepository
+    ) {
         $this->apiKeyRepository = $apiKeyRepository;
+        $this->usageLoggerRepository = $usageLoggerRepository;
     }
 
     /**
@@ -53,11 +64,40 @@ class AuthenticatorService
             return AuthResultService::fail('API_KEY_EXPIRED', 403);
         }
 
+        if ($this->isMonthlyRateLimitExceeded($key)) {
+            return AuthResultService::fail('MONTHLY_REQUEST_LIMIT_EXCEEDED', 429);
+        }
+
         // attach api key model to the request
         $request->attributes->set('api_key', $key);
 
         // return success response
         return AuthResultService::success('API_KEY_VALID', 200, $key);
+    }
+
+    /**
+     * isMonthlyRateLimitExceeded
+     *
+     * @param  mixed  $apiKey
+     * @return mixed
+     */
+    private function isMonthlyRateLimitExceeded($apiKey)
+    {
+        // monthly limit
+        $monthlyLimit = $apiKey->getEffectiveMonthlyRequestLimit();
+
+        // if monthly limit is not set; meaning unlimited
+        if (! $monthlyLimit) {
+            return;
+        }
+
+        // usuage count
+        $usageCount = $this->usageLoggerRepository->countByApiKeyId($apiKey->id);
+
+        // if usage count is greater than monthly limit
+        if ($usageCount >= $monthlyLimit) {
+            return true;
+        }
     }
 
     /**

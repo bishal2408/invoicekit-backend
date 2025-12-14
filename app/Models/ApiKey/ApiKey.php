@@ -25,6 +25,10 @@ class ApiKey extends Model
         'expires_at',
         'last_used_at',
         'deleted_at',
+        'plan_id',
+        'override_rate_limit_per_minute',
+        'override_monthly_request_limit',
+        'override_expires_at',
     ];
 
     /**
@@ -35,6 +39,7 @@ class ApiKey extends Model
     protected $casts = [
         'expires_at' => 'datetime',
         'last_used_at' => 'datetime',
+        'override_expires_at' => 'datetime',
     ];
 
     /**
@@ -55,6 +60,16 @@ class ApiKey extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * plan
+     *
+     * @return BelongsTo<Plan, $this>
+     */
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class, 'plan_id');
     }
 
     /**
@@ -79,5 +94,66 @@ class ApiKey extends Model
 
         // save quietly
         $this->saveQuietly();
+    }
+
+    /**
+     * hasActiveOverride
+     *
+     * @return bool
+     */
+    public function hasActiveOverride()
+    {
+        return $this->override_expires_at
+            && now()->lessThan($this->override_expires_at);
+    }
+
+    /**
+     * getEffectiveRateLimitPerMinute
+     *
+     * @return int|null
+     */
+    public function getEffectiveRateLimitPerMinute()
+    {
+        if ($this->hasEffectiveRateLimitPerMinute()) {
+            return $this->override_rate_limit_per_minute;
+        }
+
+        return $this->plan?->rate_limit_per_minute;
+    }
+
+    /**
+     * getEffectiveMonthlyRequestLimit
+     *
+     * @return int|null
+     */
+    public function getEffectiveMonthlyRequestLimit()
+    {
+        if ($this->hasEffectiveMonthlyRequestLimit()) {
+            return $this->override_monthly_request_limit;
+        }
+
+        return $this->plan?->monthly_request_limit;
+    }
+
+    /**
+     * hasEffectiveMonthlyRequestLimit
+     *
+     * @return bool
+     */
+    public function hasEffectiveMonthlyRequestLimit()
+    {
+        return $this->hasActiveOverride()
+            && $this->override_monthly_request_limit;
+    }
+
+    /**
+     * hasEffectiveRateLimitPerMinute
+     *
+     * @return bool
+     */
+    public function hasEffectiveRateLimitPerMinute()
+    {
+        return $this->hasActiveOverride()
+            && $this->override_rate_limit_per_minute;
     }
 }
