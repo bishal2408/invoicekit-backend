@@ -54,7 +54,7 @@ class AuthenticatorService
         $prefix = $this->extractPrefix($rawkey);
 
         // get api key from database
-        $key = $this->apiKeyRepository->findActiveKeyByPrefix($prefix);
+        $key = $this->findActiveKeyByPrefix($prefix);
 
         // if api key doesnot exist; or if key hash doesnot match
         if (! $key || ! $this->isValidHash($key->key_hash, $rawkey)) {
@@ -75,6 +75,51 @@ class AuthenticatorService
 
         // return success response
         return ApiResponseService::success('API_KEY_VALID', 200, $key);
+    }
+
+    /**
+     * findActiveKeyByPrefix
+     *
+     * @param  string  $prefix
+     * @return mixed
+     */
+    public function findActiveKeyByPrefix($prefix)
+    {
+        return $this->apiKeyRepository->findActiveKeyByPrefix($prefix);
+    }
+
+    /**
+     * extractPrefix
+     *
+     * @param  string  $apiKey
+     * @return mixed
+     */
+    public function extractPrefix($apiKey)
+    {
+        // extract prefix from api key
+        $parts = explode('_', $apiKey, 4);
+
+        // lookup prefix part of api
+        return $parts[2] ?? null;
+    }
+
+    /**
+     * Extract the api key from the request.
+     *
+     * @return string|null
+     */
+    public function extractApiKey(Request $request)
+    {
+        // extract api key from header
+        $header = $request->header('Authorization');
+
+        // check if header is set and valid
+        if (! $header || ! str_starts_with($header, 'Bearer ')) {
+            return null;
+        }
+
+        // return api key from response
+        return trim(str_replace('Bearer ', '', $header));
     }
 
     /**
@@ -115,39 +160,5 @@ class AuthenticatorService
             $validKeyHash,
             hash(config('auth.passwords.algorithm'), $requestKey)
         );
-    }
-
-    /**
-     * extractPrefix
-     *
-     * @param  string  $apiKey
-     * @return mixed
-     */
-    private function extractPrefix($apiKey)
-    {
-        // extract prefix from api key
-        $parts = explode('_', $apiKey, 4);
-
-        // lookup prefix part of api
-        return $parts[2] ?? null;
-    }
-
-    /**
-     * Extract the api key from the request.
-     *
-     * @return string|null
-     */
-    private function extractApiKey(Request $request)
-    {
-        // extract api key from header
-        $header = $request->header('Authorization');
-
-        // check if header is set and valid
-        if (! $header || ! str_starts_with($header, 'Bearer ')) {
-            return null;
-        }
-
-        // return api key from response
-        return trim(str_replace('Bearer ', '', $header));
     }
 }

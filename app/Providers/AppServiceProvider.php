@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\ApiKey\Authenticate\AuthenticatorService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -46,7 +47,12 @@ class AppServiceProvider extends ServiceProvider
 
         // rate limiter for api_keys
         RateLimiter::for('api-key', function (Request $request) {
-            $apiKey = $request->attributes->get('api_key') ?? null;
+            // authenticator service
+            $auth = app(AuthenticatorService::class);
+
+            $rawKey = $auth->extractApiKey($request);
+            $prefix = $auth->extractPrefix($rawKey);
+            $apiKey = $auth->findActiveKeyByPrefix($prefix);
 
             // if api key is not set
             if (! $apiKey) {

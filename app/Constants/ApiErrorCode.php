@@ -18,4 +18,7 @@ class ApiErrorCode
 
     // monthly request limit exceeded
     public const MONTHLY_REQUEST_LIMIT_EXCEEDED = 'MONTHLY_REQUEST_LIMIT_EXCEEDED';
+
+    // too many attempts
+    public const TOO_MANY_ATTEMPTS = 'TOO_MANY_ATTEMPTS';
 }

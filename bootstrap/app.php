@@ -1,9 +1,12 @@
 <?php
 
+use App\Constants\ApiErrorCode;
 use App\Http\Middleware\ApiKeyAuth;
+use App\Services\ApiKey\ApiResponseService;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,5 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->renderable(function (ThrottleRequestsException $e) {
+            return ApiResponseService::fail(
+                ApiErrorCode::TOO_MANY_ATTEMPTS,
+                429,
+                $e->getMessage()
+            )->toJsonResponse();
+        });
     })->create();

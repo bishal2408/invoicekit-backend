@@ -29,7 +29,7 @@ Route::prefix('v1')
         // api key routes
         Route::controller(ApiKeyController::class)->group(function () {
             // store key
-            Route::post('key', 'store')->name('key.store');
+            // Route::post('key', 'store')->name('key.store');
 
             // regenerated key
             Route::post('key/{api_key}/regenerate', 'regenerate')->name('key.regenerate');
@@ -39,5 +39,16 @@ Route::prefix('v1')
 
             // list api keys
             Route::get('key', 'index')->middleware(SanitizeParams::class)->name('key.index');
+        });
+    });
+
+// invk_test_ooah8zJn_bd2c3afc03d6d2eacc0e39841ec1f5dc0c321b0b86ebe85b
+Route::prefix('v1')
+    ->middleware(['api.key', 'throttle:api-key'])
+    ->group(function () {
+        // api key routes
+        Route::controller(ApiKeyController::class)->group(function () {
+            // store key
+            Route::post('key', 'store')->name('key.store');
         });
     });

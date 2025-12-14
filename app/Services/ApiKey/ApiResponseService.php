@@ -54,4 +54,14 @@ class ApiResponseService
             'detail' => $this->detail,
         ];
     }
+
+    /**
+     * toJsonResponse
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toJsonResponse()
+    {
+        return response()->json($this->toArray(), $this->responseCode);
+    }
 }
