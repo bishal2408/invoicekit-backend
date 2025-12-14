@@ -32,6 +32,10 @@ class CreateRequest extends FormRequest
                 'required',
                 Rule::exists('users', 'id'),
             ],
+            'plan_id' => [
+                'required',
+                Rule::exists('plans', 'id'),
+            ],
         ];
     }
 
@@ -50,6 +54,8 @@ class CreateRequest extends FormRequest
             'environment.in' => __('ENVIRONMENT_INVALID'),
             'user_id.required' => __('USER_REQUIRED'),
             'user_id.exists' => __('USER_INVALID'),
+            'plan_id.required' => __('PLAN_REQUIRED'),
+            'plan_id.exists' => __('PLAN_INVALID'),
         ];
     }
 }

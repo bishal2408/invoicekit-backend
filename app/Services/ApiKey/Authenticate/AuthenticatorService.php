@@ -2,8 +2,10 @@
 
 namespace App\Services\ApiKey\Authenticate;
 
+use App\Constants\ApiErrorCode;
 use App\Repositories\ApiKey\ApiKeyRepository;
 use App\Repositories\ApiKey\UsageLoggerRepository;
+use App\Services\ApiKey\ApiResponseService;
 use Illuminate\Http\Request;
 
 class AuthenticatorService
@@ -36,7 +38,7 @@ class AuthenticatorService
     /**
      * authenticate
      *
-     * @return AuthResultService
+     * @return ApiResponseService
      */
     public function authenticate(Request $request)
     {
@@ -45,7 +47,7 @@ class AuthenticatorService
 
         // if api key is missing
         if (! $rawkey) {
-            return AuthResultService::fail('API_KEY_MISSING', 401);
+            return ApiResponseService::fail(ApiErrorCode::API_KEY_MISSING, 401);
         }
 
         // extract prefix from api key
@@ -56,23 +58,23 @@ class AuthenticatorService
 
         // if api key doesnot exist; or if key hash doesnot match
         if (! $key || ! $this->isValidHash($key->key_hash, $rawkey)) {
-            return AuthResultService::fail('API_KEY_INVALID', 401);
+            return ApiResponseService::fail(ApiErrorCode::API_KEY_INVALID, 401);
         }
 
         // if api key is already expired
         if ($key->isExpired()) {
-            return AuthResultService::fail('API_KEY_EXPIRED', 403);
+            return ApiResponseService::fail(ApiErrorCode::API_KEY_EXPIRED, 403);
         }
 
         if ($this->isMonthlyRateLimitExceeded($key)) {
-            return AuthResultService::fail('MONTHLY_REQUEST_LIMIT_EXCEEDED', 429);
+            return ApiResponseService::fail(ApiErrorCode::MONTHLY_REQUEST_LIMIT_EXCEEDED, 429);
         }
 
         // attach api key model to the request
         $request->attributes->set('api_key', $key);
 
         // return success response
-        return AuthResultService::success('API_KEY_VALID', 200, $key);
+        return ApiResponseService::success('API_KEY_VALID', 200, $key);
     }
 
     /**

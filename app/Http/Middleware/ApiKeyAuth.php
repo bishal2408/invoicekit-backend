@@ -52,7 +52,7 @@ class ApiKeyAuth
         if (! $result->success) {
             return response()->json(
                 $result->toArray(),
-                $result->code
+                $result->responseCode
             );
         }
 
@@ -63,7 +63,7 @@ class ApiKeyAuth
         $this->usageLoggerService->log(
             $request,
             $response,
-            $result->key,
+            $result->detail, // here detail is api key
             $startTime
         );
 
